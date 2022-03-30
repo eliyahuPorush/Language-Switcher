@@ -1,0 +1,24 @@
+{
+  "name": "Language Switcher",
+  "description": "...",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation", "topSites",
+    "notifications"],
+  "action": {
+    "default_popup": "popup.html"
+
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": [
+        "node_modules/axios/dist/axios.js",
+        "content-script.js"
+      ]
+    }
+  ]
+}
