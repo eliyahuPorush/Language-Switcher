@@ -55,7 +55,7 @@ inputs.forEach(input => {
             }).then(res => {
                 const matches = res?.data?.matches.find(m => m?.shortMessage === 'Spelling mistake');
                 if (matches?.length >= 2) {
-                    input.originalText = ev.target.value;
+                    input.originalText = input.originalText + ev.target.value;
                     convertText(ev.target.value, input);
                 }
             })
@@ -84,8 +84,14 @@ function addRollbackIcon(input) {
     const id = 'language-switcher-icon-id';
     if (!input.rollbackIcon) {
         icon = document.createElement('i');
-        icon.className = 'fa fa-refresh';
+        icon.className = 'fa fa-refresh text-danger';
         icon.id = id;
+        icon.style = `margin-top: 0.25rem;
+                        border: 1px solid black;
+                        border-radius: 25%;
+                        padding: 0.5rem;
+                        font-size: 12px;`;
+        icon.title = 'rollback to original text'
         input.element.parentNode.append(icon);
         input.rollbackIcon = true;
     } else {
