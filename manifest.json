@@ -13,6 +13,12 @@
       ]
     }
   ],
+  "icons": {
+    "16": "/images/switch-icon.png",
+    "32": "/images/switch-icon.png",
+    "48": "/images/switch-icon.png",
+    "128": "/images/switch-icon.png"
+  },
   "web_accessible_resources": [
     {
       "resources": [ "/images/*" ],
