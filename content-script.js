@@ -27,77 +27,81 @@ const chars = {
     'n': 'מ',
     'm': 'צ',
     ',': 'ת',
-    '.': 'ץ'
-}
-const spellCheckApi = 'https://api.languagetool.org/v2/check';
-let inputs = Array.prototype.slice.call(document.querySelectorAll('input')).map(i => {
-    return {
-        element: i,
-        rollbackIcon: false,
-        originalText: ''
-    }
-});
-let inputsOptions = [];
-inputsOptions.length = inputs.length;
+    '.': 'ץ',
 
+    "ש": "a",
+    "ל": "k",
+    "ו": "u",
+    "ם": "o",
+    "פ": "p",
+    "ן": "i",
+    "ט": "y",
+    "א": "t",
+    "ר": "r",
+    "ק": "e",
+    "'": "w",
+    "/": "q",
+    "ד": "s",
+    "ג": "d",
+    "כ": "f",
+    "ע": "g",
+    "י": "h",
+    "ח": "j",
+    "ך": "l",
+    "ף": ";",
+    "ז": "z",
+    "ס": "x",
+    "ב": "c",
+    "ה": "v",
+    "נ": "b",
+    "מ": "n",
+    "צ": "m",
+    "ת": ",",
+    "ץ": "."
+}
+let inputs = Array.prototype.slice.call(document.querySelectorAll('input'));
 
 inputs.forEach(input => {
-    input.element.addEventListener('input', ev => {
-        if (input.element.value.split(' ').length >= 2 && input.element.value.endsWith(' ')) {
-            axios({
-                url: spellCheckApi,
-                method: 'get',
-                responseType: 'json',
-                params: {
-                    'language': 'en-US',
-                    'text': ev.target.value
-                }
-            }).then(res => {
-                const matches = res?.data?.matches.find(m => m?.shortMessage === 'Spelling mistake');
-                if (matches?.length >= 2) {
-                    input.originalText = input.originalText + ev.target.value;
-                    convertText(ev.target.value, input);
-                }
-            })
-        }
+    input.addEventListener('select', ev => {
+        if(ev.value !== '') {
+            const iconId = "language-switcher-id-606060";
+            let icon = document.querySelector(`#${iconId}`);
+            if (!icon) {
+                icon = createSwitcherIcon(input);
+                icon.id = iconId;
+                // Add click event to remove the icon
+                icon.addEventListener('click', function() {
+                    const selectedText = window.getSelection().toString();
+                    input.value = flipLetters(selectedText);
+                    icon.parentNode.removeChild(icon);
+                });
 
+                // Append the icon to the input element
+                input.parentNode.appendChild(icon);
+            }
+        }
     })
 })
 
-
-function convertText(sourceText, input) {
-    const element = input.element;
-    let converted = [];
-    sourceText?.split('').forEach(char => {
-        if (!char.match(/[ א-ת]/)) {
-            converted.push(chars[char.toLowerCase()])
-        } else {
-            converted.push(char);
-        }
-    });
-    element.value = converted.join('');
-    addRollbackIcon(input);
+function flipLetters(text) {
+    return text.split('').map(c => chars[c] ?? c).join('');
 }
 
-function addRollbackIcon(input) {
-    let icon;
-    const id = 'language-switcher-icon-id';
-    if (!input.rollbackIcon) {
-        icon = document.createElement('i');
-        icon.className = 'fa fa-refresh text-danger';
-        icon.id = id;
-        icon.style = `margin-top: 0.25rem;
-                        border: 1px solid black;
-                        border-radius: 25%;
-                        padding: 0.5rem;
-                        font-size: 12px;`;
-        icon.title = 'rollback to original text'
-        input.element.parentNode.append(icon);
-        input.rollbackIcon = true;
-    } else {
-        icon = document.querySelector('#' + id);
-    }
-    icon.addEventListener('click', () => {
-        input.element.value = input.originalText;
-    });
+function createSwitcherIcon(input) {
+    const icon = document.createElement('img');
+
+    // Calculate position of the icon
+    const selection = window.getSelection().getRangeAt(0).getBoundingClientRect();
+    const inputRect = input.getBoundingClientRect();
+    const offsetX = selection.left - inputRect.left + selection.width;
+    const offsetY = selection.top - inputRect.top;
+
+    // Set the position of the icon
+    icon.style.top = offsetY + 'px';
+    icon.style.left = offsetX + 'px';
+    icon.src = chrome.runtime.getURL('images/switch-icon.png');
+    icon.style.width = '20px';
+    icon.style.height = '20px';
+
+    return icon;
 }
